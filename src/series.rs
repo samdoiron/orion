@@ -1,28 +1,33 @@
 use std::cmp;
-use std::collections::BTreeSet;
-use std::collections::Bound::{Included};
+use std::cmp::Ordering;
+use std::collections::binary_heap::BinaryHeap;
 
 pub type MicroTime = u64; 
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[derive(Debug, Eq, PartialOrd, PartialEq, Clone)]
 pub struct DataPoint<T: Ord + Clone>(pub MicroTime, pub T);
+
+// Datapoints are ordered by time recorded, not value.
+impl<T: Ord + Clone> Ord for DataPoint<T> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let my_time = self.0;
+        let their_time = other.0;
+        return my_time.cmp(&their_time);
+    }
+}
 
 pub struct Series<T: Ord + Clone> {
     pub name: String,
-    points: Vec<DataPoint<T>>,
+    points: BinaryHeap<DataPoint<T>>,
 }
 
 impl<T: Ord + Clone> Series<T> {
     pub fn new(name: String) -> Series<T> {
-        return Series{name: name, points: vec![]}
+        return Series{name: name, points: BinaryHeap::new()}
     }
 
     pub fn len(&self) -> usize {
         return self.points.len();
-    }
-
-    pub fn random_point(&self) -> Option<DataPoint<T>> {
-        return self.points.last().map(|x| (*x).clone());
     }
 
     pub fn add_value(&mut self, point: DataPoint<T>) {
@@ -30,15 +35,34 @@ impl<T: Ord + Clone> Series<T> {
     }
 
     // Return the most recent N items, sorted by datapoint's timestamp.
-    pub fn most_recent(&self, requested_amount: usize) -> Vec<DataPoint<T>> {
+    // TODO: Optimize selecting the top-N items. Probably possible in 
+    // O(log(n)) time using a modified heap which keeps track of
+    // its number of children or something.
+    // Currently this fn has O(nlog(n)) time, where n = min(size, requested),
+    // and unnessesarily requires a mutable reference.
+    pub fn most_recent(&mut self, requested_amount: usize) -> Vec<DataPoint<T>> {
         let num_to_take = cmp::min(requested_amount, self.points.len());
-        let mut recent_points = Vec::with_capacity(num_to_take);
+        let mut points = Vec::with_capacity(num_to_take);
 
-        for i in 0..num_to_take {
-            &recent_points.push(self.points[self.points.len() - 1 - i].clone());
+        // Take max off heap for every datapoint we need
+        let mut taken = 0;
+        while taken < num_to_take {
+            let point = self.points.pop();
+            match point {
+                Some(t) => {
+                    points.push(t);
+                    taken += 1;
+                }
+                None => panic!("Got None from heap before exhausting expected size")
+            }
         }
 
-        return recent_points;
+        // Reinsert back into heap
+        for point in &points {
+            self.points.push(point.clone());
+        }
+
+        return points;
     }
 }
 
@@ -87,7 +111,7 @@ mod tests {
     fn create_series__unicode_stress_test__doesnt_panic() {
         let strs = strange_unicode_strings();
         for name in strs {
-            let var: Series<i32> = Series::new(name);
+            let _: Series<i32> = Series::new(name);
         }
     }
 
@@ -113,7 +137,7 @@ mod tests {
     #[test]
     fn most_recent__enough_elements__returns_requested_amount() {
         let num_datapoints = rand_in_range(10, 100) as usize;
-        let series = random_series(num_datapoints);
+        let mut series = random_series(num_datapoints);
 
         let tail_size = rand_in_range(1, (num_datapoints / 2) as i32) as usize;
         let tail = series.most_recent(tail_size);
@@ -124,7 +148,7 @@ mod tests {
     #[test]
     fn most_recent__too_few_elements__returns_all() {
         let num_datapoints = 100;
-        let series = random_series(num_datapoints);
+        let mut series = random_series(num_datapoints);
 
         let tail_size = num_datapoints + rand_in_range(1, num_datapoints as i32 / 10) as usize;
         let tail = series.most_recent(tail_size);
@@ -146,7 +170,7 @@ mod tests {
         }
         let most_recent = series.most_recent(3);
         let correct_order = vec![
-            datapoints[3].clone(),
+            datapoints[2].clone(),
             datapoints[0].clone(),
             datapoints[1].clone()
         ];
