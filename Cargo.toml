@@ -4,5 +4,7 @@ version = "0.1.0"
 authors = ["samdoiron <sam.doiron96@gmail.com>"]
 
 [dependencies]
-rand = "0.3.11"
-rustc-serialize = "0.3"
+net2 = "0.2.16"
+
+[dependencies.test_util]
+path = "../test_util"
