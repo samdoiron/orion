@@ -1,5 +1,12 @@
+use time;
+
+fn formatted_time() -> String {
+    let now = time::now();
+    format!("{}:{}:{}", now.tm_hour, now.tm_min, now.tm_sec)
+}
+
 fn log_at_level(level: &'static str, message: &str) {
-    println!("[{}] {}", level, message);
+    println!("{} [{}] {}", formatted_time(), level, message);
 }
 
 pub fn info(message: &str) {

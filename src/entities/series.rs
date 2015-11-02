@@ -1,6 +1,7 @@
 use std::cmp;
 use std::cmp::Ordering;
 use std::collections::binary_heap::BinaryHeap;
+use std::fmt::{Debug, Formatter, Error};
 
 pub type MicroTime = u64; 
 
@@ -90,6 +91,12 @@ impl Series {
         }
 
         return points;
+    }
+}
+
+impl Debug for Series {
+    fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
+        write!(fmt, "{}({})", self.name, self.points.len())
     }
 }
 

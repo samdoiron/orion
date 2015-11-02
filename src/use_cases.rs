@@ -1,6 +1,20 @@
 use entities::series::{Series, DataPoint};
 use entities::session::{Session};
 
+use std::fmt;
+
+#[derive(Debug)]
+pub struct NamedDataPoint {
+    pub name: String,
+    pub datapoint: DataPoint
+}
+
+impl fmt::Display for NamedDataPoint {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "NamedDataPoint({}, {}, {})", self.name, self.datapoint.0, self.datapoint.1)
+    }
+}
+
 pub fn add_value_to_series(session: &mut Session, series_name: &str, datapoint: DataPoint) {
     // Nessesary because if we didn't do this, then we would need to
     // borrow another mutable reference to add a new series in the case where
