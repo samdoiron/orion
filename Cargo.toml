@@ -3,14 +3,6 @@ name = "orion"
 version = "0.1.0"
 authors = ["samdoiron <sam.doiron96@gmail.com>"]
 
-[[bin]]
-name = "tcp_send"
-path = "src/tcp_send.rs"
-
-[[bin]]
-name = "tcp_receive"
-path = "src/tcp_receive.rs"
-
 [dependencies]
 net2 = "0.2.16"
 time = "0.1"
