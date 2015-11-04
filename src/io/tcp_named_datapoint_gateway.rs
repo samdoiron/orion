@@ -25,17 +25,17 @@ impl TcpNamedDataPointGateway {
     fn decode(&self, received: String) -> Result<NamedDataPoint, DecodeError> {
         let mut split = received.split(" ");
 
-        let name = split.next();
+        let series_name = split.next();
         let timestamp = split.next();
         let series_value = split.next();
 
-        if name.and(timestamp).and(series_value).is_some() {
-            let name = name.unwrap();
+        if series_name.and(timestamp).and(series_value).is_some() {
+            let series_name = series_name.unwrap();
             let timestamp = try!(timestamp.unwrap().parse::<u64>());
             let series_value = try!(series_value.unwrap().parse::<f64>());
 
             Ok(NamedDataPoint {
-                name: name.to_string(),
+                series_name: series_name.to_string(),
                 datapoint: DataPoint(timestamp, series_value)
             })
         } else {

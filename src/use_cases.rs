@@ -5,17 +5,19 @@ use std::fmt;
 
 #[derive(Debug)]
 pub struct NamedDataPoint {
-    pub name: String,
+    pub series_name: String,
     pub datapoint: DataPoint
 }
 
 impl fmt::Display for NamedDataPoint {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "NamedDataPoint({}, {}, {})", self.name, self.datapoint.0, self.datapoint.1)
+        write!(f, "NamedDataPoint({}, {}, {})", self.series_name, self.datapoint.0, self.datapoint.1)
     }
 }
 
-pub fn add_value_to_series(session: &mut Session, series_name: &str, datapoint: DataPoint) {
+pub fn add_value_to_series(session: &mut Session, datapoint: NamedDataPoint) {
+    let series_name = datapoint.series_name;
+    let datapoint = datapoint.datapoint;
     // Nessesary because if we didn't do this, then we would need to
     // borrow another mutable reference to add a new series in the case where
     // one didn't exist. Rust only allows one mutable borrow at a time.
@@ -25,10 +27,10 @@ pub fn add_value_to_series(session: &mut Session, series_name: &str, datapoint: 
     //
     // Unfortunately, it means we require two lookups :(
     // NOTE: Plan seems to be for rust to change this (rust-lang issue #811).
-    if session.does_series_exist(series_name) {
+    if session.does_series_exist(&series_name) {
         // Unwrap is safe unless does_series_exist lied to us (in which case
         // we should crash anyway)
-        let series = session.get_series_by_name(series_name).unwrap();
+        let mut series = session.get_series_by_name(&series_name).unwrap();
         series.add_value(datapoint);
     } else {
         let mut series = Series::new(series_name.to_string());
