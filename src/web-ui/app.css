@@ -1,0 +1,221 @@
+/* Baseline Styles / Normalization */
+
+html,
+body {
+  margin: 0;
+  font-family: 'Ubuntu', sans-serif;
+  color: #333;
+}
+
+* {
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
+}
+
+/* Utilities */
+
+.u-unselectable {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+       -o-user-select: none;
+          user-select: none;
+}
+
+.u-hidden {
+  display: none;
+}
+
+#app {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+.l-sidebar {
+  width: 15rem;
+  background-color: #95a5a6;
+  box-shadow: inset -12px 0px 10px -10px rgba(0,0,0,.2);
+}
+
+.l-primary {
+  display: flex;
+  flex: 1;
+  overflow-y: auto;
+
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+@media (max-width: 67.95rem) {
+  .l-primary {
+    justify-content: center;
+  }
+}
+
+.vertical-list {
+  overflow-y: scroll;
+}
+
+.vertical-list__item {
+  padding: 1rem;
+  color: #fefefe;
+}
+
+.vertical-list__item:hover {
+  background: rgba(255,255,255,.25);
+  cursor: pointer;
+}
+
+.series-label {
+  display: flex;
+  justify-content: space-between;
+}
+
+.series-label__name {
+  display: inline-block;
+}
+
+.series-label__value {
+  color: rgba(255,255,255,.5);
+  display: inline-block;
+}
+
+.series-label__value::before {
+  content: '=';
+  margin-right: .5rem;
+}
+
+.chart {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+
+  width: 25rem;
+  max-width: 40rem;
+  height: 20rem;
+
+  flex-grow: 1;
+}
+
+.chart__title {
+  font-size: 1.5rem;
+  margin: 0;
+  text-align: center;
+}
+
+.chart__body {
+  flex: 1;
+}
+
+
+/*
+ * Fader
+ */
+
+.fader,
+.fader--active {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: #555;
+  opacity: 0;
+}
+
+.fader--active {
+  opacity: 0.75;
+  //animation: fade-in .25s;
+}
+
+@-webkit-keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: .75;
+  }
+}
+
+/*
+ * Dialog Box
+ */
+
+.dialog {
+  background: white;
+  position: fixed;
+  height: 15rem;
+  width: 30rem;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+
+  box-shadow: 0px 3px 10px 0px rgba(0,0,0,.2);
+  border-radius: 2px;
+}
+
+@-webkit-keyframes pop-in {
+  from {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.dialog__text-area {
+  flex: 1;
+
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.dialog__message {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.dialog__buttons {
+  display: flex;
+  flex-direction: row;
+}
+
+.dialog__button {
+  font-size: 1em;
+  padding: 1rem;
+  background: white;
+  border: none;
+  flex: 1;
+  outline: none;
+}
+
+.dialog__button:first-child {
+  border-bottom-left-radius: 2px;
+}
+
+.dialog__button:last-child {
+  border-bottom-right-radius: 2px;
+}
+
+.dialog__button:hover {
+  background: rgba(0,0,0,.1);
+}
+
+.dialog__button:active {
+  background: rgba(0,0,0,.2);
+}

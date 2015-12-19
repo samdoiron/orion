@@ -1,3 +1,4 @@
+// Copyright (C) 2015  Samuel Doiron
 use test_util;
 use super::series::{Series, DataPoint, MicroTime};
 

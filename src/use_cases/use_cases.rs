@@ -1,7 +1,14 @@
+// Copyright (C) 2015  Samuel Doiron
 use entities::series::{Series, DataPoint};
+use entities::charts::{Histogram};
 use entities::session::{Session};
+use use_cases::repos::ChartRepo;
 
 use std::fmt;
+
+pub struct UseCases {
+    histogram_repo: Box<ChartRepo<Histogram>>
+}
 
 #[derive(Debug)]
 pub struct NamedDataPoint {

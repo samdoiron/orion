@@ -1,5 +1,6 @@
+// Copyright (C) 2015  Samuel Doiron
 pub mod transport;
-mod tcp_server;
+pub mod tcp_server;
 
-pub use self::transport::{Transport, TransportError, TransportResult};
+pub use self::transport::{ReadTransport, WriteTransport, TransportError, Result};
 pub use self::tcp_server::{TcpServer};

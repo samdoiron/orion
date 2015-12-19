@@ -1,5 +1,9 @@
+// Copyright (C) 2015  Samuel Doiron
 use std::collections::btree_map::BTreeMap;
 use super::series::{Series};
+
+#[derive(Debug)]
+struct SessionId(i32);
 
 pub struct Session {
     series: BTreeMap<String, Series>

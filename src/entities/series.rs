@@ -1,3 +1,4 @@
+// Copyright (C) 2015  Samuel Doiron
 use std::cmp;
 use std::cmp::Ordering;
 use std::collections::binary_heap::BinaryHeap;
@@ -68,6 +69,7 @@ impl Series {
     // its number of children or something.
     // Currently this fn has O(nlog(n)) time, where n = min(size, requested),
     // and unnessesarily requires a mutable reference.
+    // NOTE Rank-select tree?
     pub fn most_recent(&mut self, requested_amount: usize) -> Vec<DataPoint> {
         let num_to_take = cmp::min(requested_amount, self.points.len());
         let mut points = Vec::with_capacity(num_to_take);

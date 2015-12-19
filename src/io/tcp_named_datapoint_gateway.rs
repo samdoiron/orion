@@ -1,7 +1,8 @@
+// Copyright (C) 2015  Samuel Doiron
 use entities::series::DataPoint;
 use gateways::NamedDataPointGateway;
 use use_cases::NamedDataPoint;
-use transport::{TcpServer, Transport};
+use transport::{ReadTransport, TcpServer};
 
 use std::error;
 use std::fmt;
@@ -45,7 +46,7 @@ impl TcpNamedDataPointGateway {
 }
 
 impl NamedDataPointGateway for TcpNamedDataPointGateway {
-    fn receive(&mut self) -> NamedDataPoint {
+    fn receive_datapoint(&mut self) -> NamedDataPoint {
         loop {
             let datapoint = self.tcp_server.receive();
             if datapoint.is_err() {

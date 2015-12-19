@@ -1,3 +1,4 @@
+// Copyright (C) 2015  Samuel Doiron
 use std::sync::mpsc;
 use net2::{TcpListenerExt, TcpStreamExt};
 use std::net::{TcpStream, TcpListener};
@@ -12,9 +13,9 @@ use std::str;
 use std::string;
 use log;
 
-use transport::{Transport, TransportError};
+use transport::{ReadTransport, TransportError};
 
-impl Transport for TcpServer {
+impl ReadTransport for TcpServer {
     fn receive(&mut self) -> Result<String> {
         match self.package_rx.recv() {
             Ok(package) => Ok(package),

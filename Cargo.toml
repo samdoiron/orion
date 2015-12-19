@@ -6,6 +6,7 @@ authors = ["samdoiron <sam.doiron96@gmail.com>"]
 [dependencies]
 net2 = "0.2.16"
 time = "0.1"
+websocket = "~0.13.1"
 
 [[bin]]
 name = "main"

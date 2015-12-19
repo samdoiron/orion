@@ -1,12 +1,18 @@
+// Copyright (C) 2015  Samuel Doiron
 use std::io;
 use std::error;
 use std::fmt;
+use std::result;
 
-/// Represents anything that can read Strings from somewhere, for example
-/// a TCP socket.
-pub trait Transport {
-    fn receive(&mut self) -> TransportResult<String>;
-    fn receive_no_wait(&mut self) -> TransportResult<Option<String>>;
+pub type Result<T> = result::Result<T, TransportError>;
+
+pub trait ReadTransport {
+    fn receive(&mut self) -> Result<String>;
+    fn receive_no_wait(&mut self) -> Result<Option<String>>;
+}
+
+pub trait WriteTransport {
+    fn send(&mut self, &str) -> Result<()>;
 }
 
 #[derive(Debug)]
@@ -45,6 +51,3 @@ impl TransportError {
         }
     }
 }
-
-pub type TransportResult<T> = Result<T, TransportError>;
-
