@@ -12,7 +12,10 @@ pub struct Presenter<'a> {
 }
 
 impl<'a> presenter::Presenter<'a, view_models::Main> for Presenter<'a> {
-    fn new(viewOutput: &'a ViewModelOutput<view_models::Main>)
+}
+
+impl<'a> Presenter<'a> {
+    pub fn new(viewOutput: &'a mut ViewModelOutput<view_models::Main>)
         -> Presenter<'a> {
         Presenter {
             vmOutput: viewOutput

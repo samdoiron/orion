@@ -1,10 +1,10 @@
 // Orion UI Controller
-// Copyright (C) 2015  Samuel Doiron
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 use ui::presenter::{Presenter};
 use ui::command_input::CommandInput;
 use ui::command::{Command, CommandAction, is_known};
 
-struct Controller<'a, T> {
+struct Controller<'a, T: 'a> {
     presenter: &'a mut  Presenter<'a, T>,
     command_input: &'a mut CommandInput,
     action_history: Vec<CommandAction>

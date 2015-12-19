@@ -10,8 +10,14 @@ use transport::transport::{ReadTransport, TransportError};
 /// Any ReadTransport can be used as a CommandInput. It is assumed
 /// that the transport will send a properly-formed UTF-8 encoded string, which
 /// conforms to the basic CommandInput protocol (see ui::command_parser).
-struct TransportCommandInput<'a> {
+pub struct TransportCommandInput<'a> {
     transport: &'a mut ReadTransport
+}
+
+impl<'a> TransportCommandInput<'a> {
+    pub fn new(transport: &'a mut ReadTransport) -> TransportCommandInput<'a> {
+        TransportCommandInput{ transport: transport  }
+    }
 }
 
 impl<'a> CommandInput for TransportCommandInput<'a> {

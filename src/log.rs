@@ -1,4 +1,5 @@
-// Copyright (C) 2015  Samuel Doiron
+// Logging utilities
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 use time;
 
 fn formatted_time() -> String {

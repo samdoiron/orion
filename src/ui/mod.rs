@@ -7,4 +7,5 @@ mod view_model_output;
 mod command;
 mod presenter;
 mod transport_command_input;
+mod debug_view_model_output;
 pub mod web;

@@ -30,12 +30,12 @@ pub struct WebSocketServer<'a> {
 pub type Port = u16;
 
 impl<'a> WebSocketServer<'a> {
-    fn new(port: Port) -> io::Result<WebSocketServer<'a>>  {
+    pub fn new(port: Port) -> io::Result<WebSocketServer<'a>>  {
         let mut server = try!(Server::bind(("127.0.0.1", port)));
         Ok(WebSocketServer { server: server })
     }
 
-    fn accept(&mut self) -> WebSocketConnection {
+    pub fn accept(&mut self) -> WebSocketConnection {
         // Not sure what would cause this to fail.
         let request = self.server.accept()
             .ok().expect("failed to accept websocket connection")

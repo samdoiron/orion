@@ -1,5 +1,4 @@
-// Copyright (C) 2015  Samuel Doiron
-// See LICENSE for details
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 extern crate test_util;
 extern crate net2;
 extern crate time;
