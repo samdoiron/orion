@@ -2,7 +2,7 @@
 use super::{Series, Histogram};
 
 pub struct Main {
-    series: Vec<Series>,
-    charts: Vec<Histogram>
+    pub series: Vec<Series>,
+    pub charts: Vec<Histogram>
 }
 

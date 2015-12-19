@@ -8,6 +8,7 @@ use websocket::message::Type;
 
 use transport;
 use transport::{ReadTransport, WriteTransport, TransportError};
+use log;
 
 use std::io;
 
@@ -29,13 +30,21 @@ pub struct WebSocketServer<'a> {
 
 pub type Port = u16;
 
+pub struct WebSocketReceiver {
+    receiver: server::Receiver<WebSocketStream>,
+}
+
+pub struct WebSocketSender {
+    sender: server::Sender<WebSocketStream>,
+}
+
 impl<'a> WebSocketServer<'a> {
     pub fn new(port: Port) -> io::Result<WebSocketServer<'a>>  {
         let mut server = try!(Server::bind(("127.0.0.1", port)));
         Ok(WebSocketServer { server: server })
     }
 
-    pub fn accept(&mut self) -> WebSocketConnection {
+    pub fn accept(&mut self) -> (WebSocketSender, WebSocketReceiver) {
         // Not sure what would cause this to fail.
         let request = self.server.accept()
             .ok().expect("failed to accept websocket connection")
@@ -45,43 +54,42 @@ impl<'a> WebSocketServer<'a> {
         // Handshake to accept the websocket
         let response = request.accept();
         let mut conn = response.send().unwrap();
-        let (snd, rcv) = conn.split();
+        let (mut snd, mut rcv) = conn.split();
 
-        WebSocketConnection {
-            sender: snd,
-            receiver: rcv
-        }
+        (WebSocketSender{sender: snd}, WebSocketReceiver{receiver: rcv})
     }
 }
 
-pub struct WebSocketConnection {
-    receiver: server::Receiver<WebSocketStream>,
-    sender: server::Sender<WebSocketStream>,
-}
 
-fn decode_or_handle_message(sender: &mut server::Sender<WebSocketStream>, message: Message)
+fn decode_or_handle_message(message: Message)
     -> Option<String> {
+        log::warn("Ping handling disabled, connections might disconnect.");
     match message.opcode {
         Type::Text => {
             let decoded = String::from_utf8(message.payload.into_owned());
             decoded.ok()
         } 
-        Type::Ping => {
-            let pong = Message::pong(message.payload);
-            sender.send_message(&pong);
-            None
-        }
+
+        // XXX Got rid of PING handling because that would break the 
+        // seperation of sender / receiver (reading might require) sending.
+        // Those must be seperate, because ex. the presenter requires
+        // a write end and the command input requires a read end, and they can't
+        // share a single reference.
+        //
+        // Possible fixes: Arc<>, where internally read has a reference to
+        // write, and aquires it when nessesary.
+
         _ => None
     }
 }
 
-impl ReadTransport for WebSocketConnection {
+impl ReadTransport for WebSocketReceiver {
     fn receive(&mut self) -> transport::Result<String> {
         for maybe_message in self.receiver.incoming_messages() {
             return match maybe_message {
                 Ok(m) => {
                     let message: Message = m;
-                    let decoded = decode_or_handle_message(&mut self.sender, message);
+                    let decoded = decode_or_handle_message(message);
                     if decoded.is_some() {
                         Ok(decoded.unwrap())
                     } else {
@@ -104,7 +112,7 @@ impl ReadTransport for WebSocketConnection {
 
     fn receive_no_wait(&mut self) -> transport::Result<Option<String>> {
         match self.receiver.recv_message() {
-            Ok(m) => Ok(decode_or_handle_message(&mut self.sender, m)),
+            Ok(m) => Ok(decode_or_handle_message(m)),
             Err(WebSocketError::NoDataAvailable) => Ok(None),
             Err(err) => {
                 let message = "Could not receive on websocket".to_string();
@@ -114,7 +122,7 @@ impl ReadTransport for WebSocketConnection {
     }
 }
 
-impl WriteTransport for WebSocketConnection {
+impl WriteTransport for WebSocketSender {
     fn send(&mut self, message: &str) -> transport::Result<()> {
         let m: Message = Message::text(message);
         let result = self.sender.send_message(&m);

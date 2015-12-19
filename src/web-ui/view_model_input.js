@@ -31,7 +31,7 @@ class ViewModelInput {
   }
 
   static connect() {
-    return connectToServer().then(function (socket) {
+    return connectToServer().then(socket => {
       return new ViewModelInput(socket)
     })
   }

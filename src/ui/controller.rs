@@ -4,14 +4,14 @@ use ui::presenter::{Presenter};
 use ui::command_input::CommandInput;
 use ui::command::{Command, CommandAction, is_known};
 
-struct Controller<'a, T: 'a> {
+pub struct Controller<'a, T: 'a> {
     presenter: &'a mut  Presenter<'a, T>,
     command_input: &'a mut CommandInput,
     action_history: Vec<CommandAction>
 }
 
 impl<'a, T> Controller<'a, T> {
-    fn new(commands: &'a mut CommandInput, presenter: &'a mut Presenter<'a, T>) 
+    pub fn new(commands: &'a mut CommandInput, presenter: &'a mut Presenter<'a, T>) 
         -> Controller<'a, T> {
         Controller {
             presenter: presenter,
@@ -20,7 +20,8 @@ impl<'a, T> Controller<'a, T> {
         }
     }
 
-    fn run(&mut self) {
+    pub fn run(&mut self) {
+        self.presenter.send_initial_vm();
         loop {
             self.check_for_commands();
         }

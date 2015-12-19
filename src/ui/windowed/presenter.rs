@@ -8,17 +8,24 @@ use ui::view_model_output::ViewModelOutput;
 use log;
 
 pub struct Presenter<'a> {
-    vmOutput: &'a ViewModelOutput<view_models::Main>
+    vm_output: &'a mut ViewModelOutput<view_models::Main>
 }
 
 impl<'a> presenter::Presenter<'a, view_models::Main> for Presenter<'a> {
+    // See note in ui::presenter
+    fn send_initial_vm(&mut self) {
+        self.vm_output.send_vm(&view_models::Main{
+            series: vec![],
+            charts: vec![]
+        })
+    }
 }
 
 impl<'a> Presenter<'a> {
-    pub fn new(viewOutput: &'a mut ViewModelOutput<view_models::Main>)
+    pub fn new(view_output: &'a mut ViewModelOutput<view_models::Main>)
         -> Presenter<'a> {
         Presenter {
-            vmOutput: viewOutput
+            vm_output: view_output
         }
     }
 }

@@ -13,10 +13,6 @@ function drawCircle(context, opts) {
 }
 
 class ChartRenderer {
-  static render() {
-    new ChartRenderer(vm).render(canvas)
-  }
-
   constructor(vm) {
     this.vm = vm
     this.CONFIG = {
