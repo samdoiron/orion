@@ -19,13 +19,6 @@ function drawCircle(context, opts) {
 }
 
 var ChartRenderer = (function () {
-  _createClass(ChartRenderer, null, [{
-    key: 'render',
-    value: function render() {
-      new ChartRenderer(vm).render(canvas);
-    }
-  }]);
-
   function ChartRenderer(vm) {
     _classCallCheck(this, ChartRenderer);
 

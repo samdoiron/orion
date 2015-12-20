@@ -58,7 +58,17 @@
 
   function connectToVMInput() {
     m.startComputation();
-    ViewModelInput.connect().then(function () {}, function () {
+    ViewModelInput.connect().then(function (input) {
+      showMessage({
+        message: 'Successfully connected!',
+        buttons: [{
+          text: 'Celebrate!',
+          onclick: function onclick() {
+            window.location = 'https://youtu.be/3GwjfUFyY6M?t=41s';
+          }
+        }]
+      });
+    }, function () {
       showMessage({
         message: 'Could not connect to VM input',
         buttons: [{

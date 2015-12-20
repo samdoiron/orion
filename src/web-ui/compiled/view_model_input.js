@@ -40,12 +40,12 @@ var ViewModelInput = (function () {
 
   _createClass(ViewModelInput, [{
     key: 'onUpdate',
-    value: function onUpdate() {
+    value: function onUpdate(callback) {
       this.onMessageCallbacks.push(callback);
     }
   }, {
     key: 'onError',
-    value: function onError() {
+    value: function onError(callback) {
       this.onErrorCallbacks.push(callback);
     }
   }, {

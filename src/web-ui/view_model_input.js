@@ -36,11 +36,11 @@ class ViewModelInput {
     })
   }
 
-  onUpdate() {
+  onUpdate(callback) {
     this.onMessageCallbacks.push(callback);
   }
 
-  onError() {
+  onError(callback) {
     this.onErrorCallbacks.push(callback)
   }
 
