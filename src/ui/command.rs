@@ -1,10 +1,11 @@
-// Copyright (C) 2015  Samuel Doiron
-#[derive(PartialEq, Eq, Clone)]
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
+#[derive(PartialEq, Eq, Clone, Debug)]
 pub enum CommandAction {
     Unknown,
     CreateHistogram(String)
 }
 
+#[derive(PartialEq, Eq, Clone, Debug)]
 pub enum Command {
     Do(CommandAction),
     Undo

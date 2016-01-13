@@ -61,6 +61,7 @@ var ViewModelInput = (function () {
     key: 'connect',
     value: function connect() {
       return connectToServer().then(function (socket) {
+        window.socket = socket;
         return new ViewModelInput(socket);
       });
     }

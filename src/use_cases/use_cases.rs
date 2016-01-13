@@ -1,13 +1,13 @@
-// Copyright (C) 2015  Samuel Doiron
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 use entities::series::{Series, DataPoint};
 use entities::charts::{Histogram};
 use entities::session::{Session};
-use use_cases::repos::ChartRepo;
+use use_cases::repos::Repo;
 
 use std::fmt;
 
 pub struct UseCases {
-    histogram_repo: Box<ChartRepo<Histogram>>
+    histogram_repo: Box<Repo<Histogram>>
 }
 
 #[derive(Debug)]

@@ -1,4 +1,4 @@
-// Copyright (C) 2015  Samuel Doiron
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 use std::cmp;
 use std::cmp::Ordering;
 use std::collections::binary_heap::BinaryHeap;

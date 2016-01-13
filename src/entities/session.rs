@@ -1,4 +1,4 @@
-// Copyright (C) 2015  Samuel Doiron
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 use std::collections::btree_map::BTreeMap;
 use super::series::{Series};
 
@@ -11,15 +11,15 @@ pub struct Session {
 
 impl Session {
     pub fn new() -> Session {
-        return Session{series: BTreeMap::new()}
+        Session{series: BTreeMap::new()}
     }
 
     pub fn get_series_by_name(&mut self, name: &str) -> Option<&mut Series> {
-        return self.series.get_mut(name);
+        self.series.get_mut(name)
     }
 
     pub fn does_series_exist(&self, name: &str) -> bool {
-        return self.series.get(name).is_some();
+        self.series.get(name).is_some()
     }
 
     pub fn add_series(&mut self, series: Series) {

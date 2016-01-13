@@ -1,8 +1,6 @@
-// Copyright (C) 2015  Samuel Doiron
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 use ui::command::Command;
-use transport;
-use transport::ReadTransport;
-use ui::command_parser::parse_command;
+use io::transport;
 
 pub trait CommandInput {
     fn receive_command(&mut self) -> transport::Result<Command>;

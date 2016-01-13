@@ -1,13 +1,13 @@
 // High-level websocket server
-// Copyright (C) 2015  Samuel Doiron
-use websocket::{Server, Client, Message, Sender, Receiver};
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
+use websocket::{Server, Message, Sender, Receiver};
 use websocket::server;
 use websocket::result::WebSocketError;
 use websocket::stream::WebSocketStream;
 use websocket::message::Type;
 
-use transport;
-use transport::{ReadTransport, WriteTransport, TransportError};
+use super::transport;
+use super::transport::{ReadTransport, WriteTransport, TransportError};
 use log;
 
 use std::io;
@@ -38,9 +38,14 @@ pub struct WebSocketSender {
     sender: server::Sender<WebSocketStream>,
 }
 
+#[inline]
+fn is_close_notification(message: &Message) -> bool {
+    message.opcode == Type::Close
+}
+
 impl<'a> WebSocketServer<'a> {
     pub fn new(port: Port) -> io::Result<WebSocketServer<'a>>  {
-        let mut server = try!(Server::bind(("127.0.0.1", port)));
+        let server = try!(Server::bind(("127.0.0.1", port)));
         Ok(WebSocketServer { server: server })
     }
 
@@ -53,68 +58,69 @@ impl<'a> WebSocketServer<'a> {
 
         // Handshake to accept the websocket
         let response = request.accept();
-        let mut conn = response.send().unwrap();
-        let (mut snd, mut rcv) = conn.split();
+        let conn = response.send().unwrap();
+        let (snd, rcv) = conn.split();
 
         (WebSocketSender{sender: snd}, WebSocketReceiver{receiver: rcv})
     }
 }
 
 
-fn decode_or_handle_message(message: Message)
-    -> Option<String> {
-        log::warn("Ping handling disabled, connections might disconnect.");
+fn decode_or_handle_message(message: Message) -> transport::Result<Option<String>> {
     match message.opcode {
         Type::Text => {
             let decoded = String::from_utf8(message.payload.into_owned());
-            decoded.ok()
-        } 
+            Ok(decoded.ok())
+        },
+
+        Type::Close => {
+            Err(TransportError::Closed)
+        },
 
         // XXX Got rid of PING handling because that would break the 
-        // seperation of sender / receiver (reading might require) sending.
+        // seperation of sender / receiver (reading might require sending).
         // Those must be seperate, because ex. the presenter requires
         // a write end and the command input requires a read end, and they can't
         // share a single reference.
         //
         // Possible fixes: Arc<>, where internally read has a reference to
         // write, and aquires it when nessesary.
+        Type::Ping => {
+            log::warn("Ping was sent, and ignored.");
+            Ok(None)
+        },
 
-        _ => None
+        _ => Ok(None)
     }
 }
 
 impl ReadTransport for WebSocketReceiver {
     fn receive(&mut self) -> transport::Result<String> {
         for maybe_message in self.receiver.incoming_messages() {
-            return match maybe_message {
+            match maybe_message {
                 Ok(m) => {
-                    let message: Message = m;
-                    let decoded = decode_or_handle_message(message);
-                    if decoded.is_some() {
-                        Ok(decoded.unwrap())
-                    } else {
-                        let message = "Failed to decode message as utf-8".to_string();
-                        Err(TransportError::new(message, None))
+                    let decoded = decode_or_handle_message(m);
+                    match decoded {
+                        Ok(Some(message)) => return Ok(message),
+                        Err(err) => return Err(err),
+                        _ => ()
                     }
-                },
-                Err(err) => {
-                    let message = "Failed to receive message".to_string();
-                    Err(TransportError::new(message, None))
                 }
-            }
+                Err(err) => {
+                    let message = format!("failed to receive message: {}", err)
+                        .to_string();
+                    return Err(TransportError::new(message, None))
+                }
+            };
         }
-        return Err(TransportError::new("Websocket closed?".to_string(), None))
+        return Err(TransportError::Error("Unknown websocket error".to_string()));
     }
-
-    // What is the difference between the expected running time
-    // of an randomized algorithm and the expected running time of
-    // a deterministic algorithm.
 
     fn receive_no_wait(&mut self) -> transport::Result<Option<String>> {
         match self.receiver.recv_message() {
-            Ok(m) => Ok(decode_or_handle_message(m)),
+            Ok(m) => decode_or_handle_message(m),
             Err(WebSocketError::NoDataAvailable) => Ok(None),
-            Err(err) => {
+            Err(_) => {
                 let message = "Could not receive on websocket".to_string();
                 Err(TransportError::new(message, None))
             }

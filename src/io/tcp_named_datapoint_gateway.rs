@@ -1,8 +1,10 @@
-// Copyright (C) 2015  Samuel Doiron
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 use entities::series::DataPoint;
 use gateways::NamedDataPointGateway;
 use use_cases::NamedDataPoint;
-use transport::{ReadTransport, TcpServer};
+
+use io::transport::ReadTransport;
+use io::tcp_server::{TcpServer};
 
 use std::error;
 use std::fmt;

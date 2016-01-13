@@ -1,4 +1,4 @@
-// Copyright (C) 2015  Samuel Doiron
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 mod controller;
 mod windowed;
 mod command_input;

@@ -1,4 +1,4 @@
-// Copyright (C) 2015  Samuel Doiron
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 use std::sync::mpsc;
 use net2::{TcpListenerExt, TcpStreamExt};
 use std::net::{TcpStream, TcpListener};
@@ -13,7 +13,7 @@ use std::str;
 use std::string;
 use log;
 
-use transport::{ReadTransport, TransportError};
+use io::transport::{ReadTransport, TransportError};
 
 impl ReadTransport for TcpServer {
     fn receive(&mut self) -> Result<String> {
@@ -95,7 +95,7 @@ impl TcpAcceptor {
             match listen.accept() {
                 Ok((stream, _)) => self.handle_connection(stream),
                 Err(err) => {
-                    // WouldBlock is normal (just means there was no TCP client
+                    // WouldBlock is normal, just means there was no TCP client
                     // waiting to connect, and we won't wait for one because we're
                     // in non-blocking mode.
                     if err.kind() != io::ErrorKind::WouldBlock {

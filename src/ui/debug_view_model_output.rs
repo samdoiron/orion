@@ -1,8 +1,8 @@
 // Fake view model output for debugging
 // Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 
+use io::serialize::Serialize;
 use ui::view_model_output::ViewModelOutput;
-use log;
 
 pub struct DebugViewModelOutput;
 
@@ -12,8 +12,9 @@ impl DebugViewModelOutput {
     }
 }
 
-impl<'a, T> ViewModelOutput<T> for DebugViewModelOutput {
+impl<'a, T: Serialize> ViewModelOutput<T> for DebugViewModelOutput {
     fn send_vm(&mut self, vm: &T) {
-        log::debug("Would send on ViewModelOutput");
+        println!("Viewmodel was sent to debug viewmodel output {}", vm.serialize());
     }
 }
+

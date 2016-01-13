@@ -1,5 +1,5 @@
-// Copyright (C) 2015  Samuel Doiron
-use use_cases::repos::{ChartRepo, Id, make_id};
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
+use use_cases::repos::{Repo, Id, make_id};
 use entities::charts::Histogram;
 use std::collections::BTreeMap;
 use std::marker::PhantomData;
@@ -34,7 +34,7 @@ macro_rules! impl_in_memory_for {
             }
         }
         $(
-            impl ChartRepo<$chart> for InMemoryRepo {
+            impl Repo<$chart> for InMemoryRepo {
                 fn store(&mut self, item: $chart) -> Id<$chart> {
                     let id = self.$ids.next();
                     self.$map.insert(id.clone(), item);

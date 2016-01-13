@@ -1,11 +1,7 @@
-// Copyright (C) 2015  Samuel Doiron
-use entities::Series;
-
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 use ui::presenter;
 use ui::windowed::view_models;
 use ui::view_model_output::ViewModelOutput;
-
-use log;
 
 pub struct Presenter<'a> {
     vm_output: &'a mut ViewModelOutput<view_models::Main>

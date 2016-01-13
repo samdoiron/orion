@@ -1,0 +1,34 @@
+     Running target/debug/main-3b39ee14fffa35df
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured
+
+     Running target/debug/orion-bc8cc8992495ec81
+
+running 15 tests
+test entities::series::tests::add_value__increases_length ... ok
+test entities::series::tests::len__with_content__returns_num_points ... ok
+test entities::series::tests::most_recent__enough_elements__returns_requested_amount ... ok
+test entities::series::tests::most_recent__items_added_unsorted__returns_sorted_by_time ... ok
+test entities::session::tests::does_series_exist__when_it_does_not__says_it_does_not ... ok
+test entities::series::tests::most_recent__too_few_elements__returns_all ... ok
+test entities::session::tests::get_series_by_name__with_matching_series__returns_series ... ok
+test entities::session::tests::does_series_exist__when_it_does__says_it_does ... ok
+test ui::command_parser::test::parse_command__create_histogram_no_name_field__returns_err ... ok
+test ui::command_parser::test::parse_command__just_string_undo_command__returns_undo_command ... ok
+test ui::command_parser::test::parse_command__neither_do_nor_undo__returns_err ... ok
+test entities::session::tests::get_series_by_name__with_no_matching_series__returns_none ... ok
+doSomeActionwell
+test ui::command_parser::test::parse_command__undo_with_extra_at_end__returns_err ... ok
+test entities::series::tests::create_series__unicode_stress_test__doesnt_panic ... ok
+test ui::command_parser::test::parse_command__unicode_stress_test__doesnt_panic ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured
+
+   Doc-tests orion
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured
+

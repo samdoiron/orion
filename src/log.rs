@@ -1,6 +1,7 @@
 // Logging utilities
 // Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 use time;
+use std::process::exit;
 
 fn formatted_time() -> String {
     let now = time::now();
@@ -29,7 +30,8 @@ pub fn error(message: &str) {
 }
 
 // TODO Log errors to stderr instead of stdout
-pub fn fatal(message: &str) {
-    log_at_level("FATAL", message)
+pub fn fatal(message: &str, code: i32) {
+    log_at_level("FATAL", message);
+    exit(code);
 }
 

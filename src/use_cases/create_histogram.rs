@@ -1,4 +1,4 @@
-// Copyright (C) 2015  Samuel Doiron
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 pub fn create_histogram(output: &mut OnHistogramCreated, name: &str) {
     output.histogram_created(HistogramCreated {
     });

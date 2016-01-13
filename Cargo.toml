@@ -7,6 +7,8 @@ authors = ["samdoiron <sam.doiron96@gmail.com>"]
 net2 = "0.2.16"
 time = "0.1"
 websocket = "~0.13.1"
+rustc-serialize = "0.3"
+
 
 [[bin]]
 name = "main"
@@ -14,3 +16,6 @@ path = "src/main.rs"
 
 [dependencies.test_util]
 path = "../test_util"
+
+[profile.dev]
+debug = true

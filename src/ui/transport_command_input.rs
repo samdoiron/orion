@@ -1,15 +1,20 @@
-// Copyright (C) 2015  Samuel Doiron
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 use std::convert;
 
 use ui::command_input::CommandInput;
 use ui::command::Command;
 use ui::command_parser::{parse_command, ParseError};
-use transport::transport;
-use transport::transport::{ReadTransport, TransportError};
+
+use io::transport;
+use io::transport::{ReadTransport, TransportError};
 
 /// Any ReadTransport can be used as a CommandInput. It is assumed
 /// that the transport will send a properly-formed UTF-8 encoded string, which
 /// conforms to the basic CommandInput protocol (see ui::command_parser).
+///
+/// This might be a middleman, because CommandInput is already coupled to transport,
+/// because it returns transport types. However, you can use transport types without
+/// actually implementing a transport, so I think it's OK for now.
 pub struct TransportCommandInput<'a> {
     transport: &'a mut ReadTransport
 }
@@ -36,7 +41,7 @@ impl<'a> CommandInput for TransportCommandInput<'a> {
 }
 
 impl convert::From<ParseError> for TransportError {
-    fn from(err: ParseError) -> TransportError {
+    fn from(_err: ParseError) -> TransportError {
         TransportError::new("Protocol error: failed to parse command".to_string(), None)
     }
 }

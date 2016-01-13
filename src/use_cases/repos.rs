@@ -1,5 +1,4 @@
-// Copyright (C) 2015  Samuel Doiron
-use entities::charts::Histogram;
+// Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 use std::marker::PhantomData;
 use std::cmp::Ord;
 use std::cmp::Ordering;
@@ -43,7 +42,7 @@ impl<T> Clone for Id<T> {
 
 impl<T> Copy for Id<T> {}
 
-pub trait ChartRepo<T> {
+pub trait Repo<T> {
     fn store(&mut self, T) -> Id<T>;
     fn get(&self, Id<T>) -> Option<&T>;
 }
