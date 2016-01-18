@@ -1,48 +1,47 @@
 // Copyright (C) 2015  Samuel Doiron, see LICENSE for details
-use use_cases::repos::{Repo, Id, make_id};
-use entities::charts::Histogram;
+use use_cases::repos::{Repo, RepoResult};
+
+use entities::identified::Identified;
+use entities::charts::{Histogram, ChartId};
+
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
-
-struct IdGenerator<T> {
-    next_id: u32,
-    _phantom: PhantomData<T>
-}
-
-impl<T> IdGenerator<T> {
-    fn new() -> IdGenerator<T> {
-        IdGenerator { next_id: 1, _phantom: PhantomData }
-    }
-
-    fn next(&mut self) -> Id<T> {
-        let current = self.next_id;
-        self.next_id += 1;
-        make_id::<T>(current)
-    }
-}
+use std::mem;
 
 macro_rules! impl_in_memory_for {
-    ( $( $chart:ident, $map:ident, $ids:ident ),* ) => {
+    ( $( $chart:ident, $map:ident ),* ) => {
         impl InMemoryRepo {
             fn new() -> InMemoryRepo {
                 InMemoryRepo {
                 $(
-                    $map: BTreeMap::new(),
-                    $ids: IdGenerator::new(),
+                    $map: BTreeMap::new()
                  )*
                 }
             }
         }
         $(
-            impl Repo<$chart> for InMemoryRepo {
-                fn store(&mut self, item: $chart) -> Id<$chart> {
-                    let id = self.$ids.next();
-                    self.$map.insert(id.clone(), item);
-                    id
+            impl Repo<ChartId, $chart> for InMemoryRepo {
+                fn add(&mut self, item: $chart) -> RepoResult<()> {
+                    let id = item.id();
+                    self.$map.insert(id, item);
+                    Ok(())
                 }
 
-                fn get(&self, id: Id<$chart>) -> Option<&$chart> {
-                    self.$map.get(&id)
+                fn get(&self, id: ChartId) -> RepoResult<Option<$chart>> {
+                    Ok(self.$map.get(&id).map(|c| c.clone()))
+                }
+
+                fn update(&mut self, new_chart: $chart) 
+                    -> RepoResult<Option<()>> {
+
+                    let updated = self.$map.get_mut(&new_chart.id())
+                        .map(|old| mem::replace(old, new_chart));
+
+                    Ok(updated.map(|_| ()))
+                }
+
+                fn remove(&mut self, id: ChartId)
+                    -> RepoResult<Option<$chart>> {
+                    Ok(self.$map.remove(&id))
                 }
             }
          )*
@@ -50,12 +49,11 @@ macro_rules! impl_in_memory_for {
 }
 
 struct InMemoryRepo {
-    histogram_ids: IdGenerator<Histogram>,
-    histograms: BTreeMap<Id<Histogram>, Histogram>
+    histograms: BTreeMap<ChartId, Histogram>
 }
 
 // Can't generate the struct above, because concat_ident! doesn't work for
 // keys in struct definitions.
 impl_in_memory_for! {
-    Histogram, histograms, histogram_ids
+    Histogram, histograms
 }

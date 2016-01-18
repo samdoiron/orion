@@ -25,6 +25,8 @@ impl Session {
     pub fn add_series(&mut self, series: Series) {
         self.series.insert(series.name.clone(), series);
     }
+
+
 }
 
 #[allow(non_snake_case, dead_code)]

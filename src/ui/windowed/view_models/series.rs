@@ -11,3 +11,4 @@ pub struct Series {
     name: String,
     current_value: DataPoint
 }
+

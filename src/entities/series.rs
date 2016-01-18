@@ -2,7 +2,8 @@
 use std::cmp;
 use std::cmp::Ordering;
 use std::collections::binary_heap::BinaryHeap;
-use std::fmt::{Debug, Formatter, Error};
+
+use entities::identified::Identified;
 
 pub type MicroTime = u64; 
 
@@ -45,6 +46,15 @@ impl Ord for DataPoint {
     }
 }
 
+pub type SeriesId = String;
+
+impl Identified<SeriesId> for Series {
+    fn id(&self) -> SeriesId {
+        self.name.clone()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct Series {
     pub name: String,
     points: BinaryHeap<DataPoint>,
@@ -52,7 +62,7 @@ pub struct Series {
 
 impl Series {
     pub fn new(name: String) -> Series {
-        return Series{name: name, points: BinaryHeap::new()}
+        Series{name: name, points: BinaryHeap::new()}
     }
 
     pub fn len(&self) -> usize {
@@ -93,12 +103,6 @@ impl Series {
         }
 
         return points;
-    }
-}
-
-impl Debug for Series {
-    fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
-        write!(fmt, "{}({})", self.name, self.points.len())
     }
 }
 

@@ -1,14 +1,8 @@
 // Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 use entities::series::{Series, DataPoint};
-use entities::charts::{Histogram};
 use entities::session::{Session};
-use use_cases::repos::Repo;
 
 use std::fmt;
-
-pub struct UseCases {
-    histogram_repo: Box<Repo<Histogram>>
-}
 
 #[derive(Debug)]
 pub struct NamedDataPoint {
@@ -35,8 +29,6 @@ pub fn add_value_to_series(session: &mut Session, datapoint: NamedDataPoint) {
     // Unfortunately, it means we require two lookups :(
     // NOTE: Plan seems to be for rust to change this (rust-lang issue #811).
     if session.does_series_exist(&series_name) {
-        // Unwrap is safe unless does_series_exist lied to us (in which case
-        // we should crash anyway)
         let mut series = session.get_series_by_name(&series_name).unwrap();
         series.add_value(datapoint);
     } else {

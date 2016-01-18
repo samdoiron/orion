@@ -6,6 +6,8 @@
 // Obviously re-enable this later on.
 #![allow(dead_code)]
 
+#![deny(warnings)]
+
 extern crate test_util;
 extern crate net2;
 extern crate time;
@@ -13,6 +15,7 @@ extern crate websocket;
 extern crate rustc_serialize;
 
 mod log;
+mod util;
 pub mod entities;
 pub mod use_cases;
 pub mod gateways;
