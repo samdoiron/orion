@@ -5,4 +5,5 @@ pub mod main;
 
 pub use self::main::Main;
 pub use self::series::Series;
+pub use self::series::DataPoint;
 pub use self::histogram::Histogram;

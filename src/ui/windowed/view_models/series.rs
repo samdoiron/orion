@@ -2,13 +2,13 @@
 
 #[derive(RustcDecodable, RustcEncodable)]
 pub struct DataPoint {
-    time: u64,
-    value: f64
+    pub time: u64,
+    pub value: f64
 }
 
 #[derive(RustcDecodable, RustcEncodable)]
 pub struct Series {
-    name: String,
-    current_value: DataPoint
+    pub name: String,
+    pub current_value: DataPoint
 }
 

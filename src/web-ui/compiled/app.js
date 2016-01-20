@@ -1,6 +1,34 @@
-'use strict';
+define(['view-model-input', 'dialog-component', 'layout'], function (_viewModelInput, _dialogComponent, _layout) {
+  'use strict';
 
-;(function () {
+  var _viewModelInput2 = _interopRequireDefault(_viewModelInput);
+
+  var _dialogComponent2 = _interopRequireDefault(_dialogComponent);
+
+  var Layout = _interopRequireWildcard(_layout);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
 
   var vm = {
     local: {
@@ -8,33 +36,10 @@
         isActive: false
       })
     },
-    remote: {
-      series: [
-        // { name: 'fps', value: 10 },
-        // { name: 'numEntities', value: 10 },
-        // { name: 'score', value: 10 }
-      ],
-      charts: [
-        // {
-        //   title: 'fps vs. time',
-        //   xMin: 0,
-        //   xMax: 10,
-        //   yMin: 0,
-        //   yMax: 10,
-        //   points: m.prop([
-        //     {x: 0, y: Math.random() * 10},
-        //     {x: Math.random() * 10, y: Math.random() * 10},
-        //     {x: Math.random() * 10, y: Math.random() * 10},
-        //     {x: Math.random() * 10, y: Math.random() * 10},
-        //     {x: Math.random() * 10, y: Math.random() * 10},
-        //     {x: Math.random() * 10, y: Math.random() * 10},
-        //     {x: Math.random() * 10, y: Math.random() * 10},
-        //     {x: Math.random() * 10, y: Math.random() * 10},
-        //     {x: 10, y: Math.random() * 10},
-        //   ])
-        // },
-      ]
-    }
+    remote: m.prop({
+      series: [],
+      charts: []
+    })
   };
 
   function showMessage(opts) {
@@ -43,63 +48,81 @@
       message: opts.message,
       buttons: (opts.buttons || []).map(function (button) {
         var oldClick = button.onclick;
+
         button.onclick = function () {
           oldClick();
-          vm.local.error({ isActive: false });
+          vm.local.error({
+            isActive: false
+          });
         };
+
         return button;
       })
     });
   }
 
   function hideMessage() {
-    vm.local.error({ isActive: false });
+    vm.local.error({
+      isActive: false
+    });
   }
 
-  function connectToVMInput() {
-    m.startComputation();
-    ViewModelInput.connect().then(function (input) {}, function () {
-      showMessage({
-        message: 'Could not connect to VM input',
-        buttons: [{
-          text: 'Retry',
-          onclick: connectToVMInput
-        }]
-      });
-    }).then(m.endComputation);
+  function verticalList(items) {
+    return m('.vertical-list', items.map(function (item) {
+      return m('.vertical-list__item', item);
+    }));
   }
 
-  connectToVMInput();
+  function errorDialog() {
+    return m.component(_dialogComponent2.default, vm.local.error());
+  }
+
+  function bem(name, values) {
+    var children = _.map(values, function (subVal, subName) {
+      return m('.' + name + '__#{subName}', subVal);
+    });
+
+    return m('.' + name, children);
+  }
 
   var OrionApp = {
     controller: function controller() {},
-
     view: function view() {
-      var series = vm.remote.series,
-          charts = vm.remote.charts;
-
-      return [m('.l-sidebar', [m('.vertical-list', series.map(this.renderSeries.bind(this)))]), m('.l-primary', charts.map(this.renderChart.bind(this))), m.component(DialogComponent, vm.local.error())];
+      var series = vm.remote().series,
+          charts = vm.remote().charts;
+      return [Layout.sidebar([verticalList(series.map(this.renderSeries))]), Layout.primary(charts.map(this.renderChart)), errorDialog()];
     },
-
     renderSeries: function renderSeries(seriesVm) {
-      return m('.vertical-list__item', [m('.series-label.u-unselectable', [m('.series-label__name', seriesVm.name), m('.series-label__value', seriesVm.value)])]);
+      return bem('series-label', {
+        name: seriesVm.name,
+        value: seriesVm.current_value.value
+      });
     },
-
     renderChart: function renderChart(chartVm) {
-      return m('.chart', [m('h1.chart__title', chartVm.title), m('.chart__body', [m('canvas', { config: this.configChart.bind(this, chartVm) })])]);
+      return bem('chart', {
+        title: chartVm.title,
+        body: [m('canvas', {
+          config: this.configChart.bind(this, chartVm)
+        })]
+      });
     },
-
-    configChart: function configChart(chartVm, canvas, isInitialized) {
-      if (!isInitialized) {
-        canvas.parentElement.addEventListener('resize', function () {
-          resizeCanvasToParent(canvas);
-          ChartRenderer.render(chartVm, canvas);
-        });
-      }
+    configChart: function configChart(chartVm, canvas) {
       resizeCanvasToParent(canvas);
       ChartRenderer.render(chartVm, canvas);
     }
   };
+  var connectTimeoutMs = 100;
 
+  function connectToVMInput() {
+    _viewModelInput2.default.connect().then(function (vmInput) {
+      vmInput.onUpdate(vm.remote);
+    }, function () {
+      setTimeout(connectToVMInput, connectTimeoutMs);
+      connectTimeoutMs *= 1.5;
+    });
+  }
+
+  connectToVMInput();
   m.mount(document.getElementById('app'), OrionApp);
-})();
+});
+//# sourceMappingURL=app.js.map

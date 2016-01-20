@@ -6,10 +6,11 @@ pub trait ViewModelOutput<T> {
     fn send_vm(&mut self, &T);
 }
 
-impl<'a, T> ViewModelOutput<T> for WriteTransport
-    where T: Serialize {
+impl<'a, V, T> ViewModelOutput<V> for T
+    where V: Serialize,
+          T: WriteTransport {
 
-    fn send_vm(&mut self, vm: &T) {
+    fn send_vm(&mut self, vm: &V) {
         self.send(&vm.serialize())
             .ok().expect("failed to send vm on write transport");
     }

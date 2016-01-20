@@ -12,9 +12,12 @@ body {
        box-sizing: border-box;
 }
 
-/* Utilities */
+/* 
+ * Utilities 
+ */
 
-.u-unselectable {
+.u-unselectable,
+.series-label {
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
@@ -32,10 +35,17 @@ body {
   width: 100vw;
 }
 
+/* 
+ * Layout 
+ */
+
 .l-sidebar {
   width: 15rem;
   background-color: #95a5a6;
   box-shadow: inset -12px 0px 10px -10px rgba(0,0,0,.2);
+
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 .l-primary {
@@ -55,6 +65,11 @@ body {
   }
 }
 
+
+/*
+ * Vertical List
+ */
+
 .vertical-list {
   overflow-y: scroll;
 }
@@ -68,6 +83,11 @@ body {
   background: rgba(255,255,255,.25);
   cursor: pointer;
 }
+
+
+/*
+ * Series Label
+ */
 
 .series-label {
   display: flex;
@@ -115,6 +135,10 @@ body {
  * Fader
  */
 
+.fader {
+  display: none;
+}
+
 .fader,
 .fader--active {
   position: fixed;
@@ -128,7 +152,7 @@ body {
 
 .fader--active {
   opacity: 0.75;
-  //animation: fade-in .25s;
+  display: block;
 }
 
 @-webkit-keyframes fade-in {
@@ -142,6 +166,8 @@ body {
 
 /*
  * Dialog Box
+ *
+ * Used for error messages / other "Stop the world" notifications.
  */
 
 .dialog {
@@ -161,18 +187,6 @@ body {
 
   box-shadow: 0px 3px 10px 0px rgba(0,0,0,.2);
   border-radius: 2px;
-}
-
-@-webkit-keyframes pop-in {
-  from {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  to {
-    transform: scale(1);
-  }
 }
 
 .dialog__text-area {

@@ -1,7 +1,5 @@
-// Example:
-
-let DialogComponent = {
-  view: function (_ctrl, given) {
+export default {
+  view(_ctrl, given) {
     let args = {
       isActive: given.isActive,
       message: given.message || 'no message',
@@ -13,7 +11,7 @@ let DialogComponent = {
     ])
   },
 
-  backgroundFader: function (isActive) {
+  backgroundFader(isActive) {
     if (isActive)  {
       return m('.fader--active')
     } else {
@@ -21,7 +19,7 @@ let DialogComponent = {
     }
   },
 
-  dialog: function (args) {
+  dialog(args) {
     if (!args.isActive) return []
     return m('.dialog', [
       this.textArea(args.message), 
@@ -29,25 +27,25 @@ let DialogComponent = {
     ])
   },
 
-  textArea: function (text) {
+  textArea(text) {
     return m('.dialog__text-area', [
       this.message(text)
     ])
   },
 
-  message: function (message) {
+  message(message) {
     return m('h1.dialog__message', message)
   },
 
-  buttons: function (buttons) {
+  buttons(buttons) {
     return m('.dialog__buttons', 
       buttons.map(this.button.bind(this))
     )
   },
 
-  button: function (button) {
+  button(button) {
     return m('button.dialog__button', {
       onclick: button.onclick
     }, button.text)
   },
-}
+};

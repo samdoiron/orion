@@ -21,9 +21,9 @@ function connectToServer() {
   return openWebsocket(CONFIG.webSocketServer)
 }
 
-class ViewModelInput {
+export default class ViewModelInput {
   constructor(socket) {
-    this.socket = socket;
+    this.socket = socket
     this.socket.onmessage = this._onMessage.bind(this)
 
     this.onMessageCallbacks = []
@@ -32,22 +32,24 @@ class ViewModelInput {
 
   static connect() {
     return connectToServer().then(socket => {
-      window.socket = socket;
+      window.socket = socket
       return new ViewModelInput(socket)
     })
   }
 
   onUpdate(callback) {
-    this.onMessageCallbacks.push(callback);
+    this.onMessageCallbacks.push(callback)
   }
 
   onError(callback) {
     this.onErrorCallbacks.push(callback)
   }
 
-  _onMessage() {
-    m.beginComputation()
-    _.each(this.onErrorCalbacks, cb => cb())
+  _onMessage(message) {
+    m.startComputation();
+    let vm = JSON.parse(message.data)
+    console.log('%c VM', 'color: hotpink', vm)
+    this.onMessageCallbacks.forEach(x => x(vm))
     m.endComputation();
   }
 }

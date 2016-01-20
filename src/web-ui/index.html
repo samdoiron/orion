@@ -12,9 +12,10 @@
   <script src="vendor/mithril.js"></script>
   <script src="vendor/lodash.min.js"></script>
 
-  <script src="compiled/view_model_input.js"></script>
-  <script src="compiled/dialog_component.js"></script>
-  <script src="compiled/chart_renderer.js"></script>
-  <script src="compiled/app.js"></script>
+  <script src="vendor/require.js" data-main="compiled/app">
+    requirejs.config({
+      baseUrl: 'compiled'
+    });
+  </script>
 </body>
 </html>
