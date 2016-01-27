@@ -74,12 +74,12 @@ body {
   overflow-y: scroll;
 }
 
-.vertical-list__item {
+.vertical-list > * {
   padding: 1rem;
   color: #fefefe;
 }
 
-.vertical-list__item:hover {
+.vertical-list > *:hover {
   background: rgba(255,255,255,.25);
   cursor: pointer;
 }
@@ -92,6 +92,7 @@ body {
 .series-label {
   display: flex;
   justify-content: space-between;
+  padding: 1rem;
 }
 
 .series-label__name {

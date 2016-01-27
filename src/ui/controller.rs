@@ -37,7 +37,7 @@ impl<'a, T> Controller<'a, T> {
         match self.command_input.receive_command_no_wait() {
             Ok(Some(command)) => self.handle_command(command),
             Err(TransportError::Closed) => log::fatal("Web UI was closed", 0),
-            Err(err) => panic!(err),
+            Err(err) => panic!("{}", err),
             Ok(None) => ()
         };
     }
@@ -61,6 +61,7 @@ impl<'a, T> Controller<'a, T> {
         //}
 
         if is_known(&action) {
+            println!("Recieved known action request (aka CreateHistogram)");
             self.action_history.push(action);
         }
     }

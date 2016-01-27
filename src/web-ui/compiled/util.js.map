@@ -1,0 +1,1 @@
+{"version":3,"sources":["../util.js"],"names":[],"mappings":";;;;;;UAAgB,IAAI,GAAJ,IAAI;;WAAJ,IAAI","file":"util.js","sourcesContent":["export function args(func, ...args) {\n  return func.bind(null, ...args)\n}\n"]}

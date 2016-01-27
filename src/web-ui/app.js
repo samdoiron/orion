@@ -1,8 +1,15 @@
-import ViewModelInput from 'view-model-input'; 
+import connectToServer from 'server';
 import DialogComponent from 'dialog-component';
+import { args } from 'util';
 import * as Layout from 'layout';
 
-let vm = { local: {
+let server = {
+  commandOutput: null,
+  vmInput: null
+}
+
+let vm = {
+  local: {
     error: m.prop({
       isActive: false
     })
@@ -11,75 +18,44 @@ let vm = { local: {
     series: [],
     charts: []
   })
-};
-
-function showMessage(opts) {
-  vm.local.error({
-    isActive: true,
-    message: opts.message,
-    buttons: (opts.buttons || []).map(button => {
-      let oldClick = button.onclick;
-      button.onclick = () => {
-        oldClick();
-        vm.local.error({ isActive: false });
-      }
-      return button;
-    })
-  })
-}
-
-function hideMessage() {
-  vm.local.error({ isActive: false });
-}
-
-function verticalList(items) {
-  return m('.vertical-list', items.map(item => {
-    return m('.vertical-list__item', item);
-  }));
-}
-
-function errorDialog() {
-    return m.component(DialogComponent, vm.local.error());
-}
-
-function bem(name, values) {
-  let children = _.map(values, (subVal, subName) => {
-    return m(`.${name}__#{subName}`, subVal);
-  });
-  return m(`.${name}`, children);
 }
 
 let OrionApp = {
   controller: function () {
+    return {
+      createHistogram: (name) => {
+        server.commandOutput.createHistogram(name)
+      }
+    }
   },
 
-  view() {
+  view(ctrl) {
     let series = vm.remote().series,
-      charts = vm.remote().charts;
+      charts = vm.remote().charts
 
+    this.ctrl = ctrl
     return [
       Layout.sidebar([
-        verticalList(series.map(this.renderSeries)),
+        m('.vertical-list', series.map(this.renderSeries.bind(this, ctrl))),
       ]),
-      Layout.primary(charts.map(this.renderChart)),
-      errorDialog()
+      Layout.primary(charts.map(this.renderChart))
     ]
   },
 
-  renderSeries(seriesVm) {
-    return bem('series-label', {
-      name: seriesVm.name,
-      value: seriesVm.current_value.value
-    })
+  renderSeries(ctrl, seriesVm) {
+    return m('.series-label', {onclick: args(ctrl.createHistogram, seriesVm.name)}, [
+      m('.series-label__name', seriesVm.name),
+      m('.series-label__value', seriesVm.current_value.value)
+    ])
   },
 
   renderChart(chartVm) {
-    return bem('chart', {
-      title: chartVm.title,
-      body: [
-        m('canvas', { config: this.configChart.bind(this, chartVm) })
-      ]
-    });
+    return m('.chart', [
+      m('.chart__title', chartVm.title),
+      m('.chart__body', [
+        m('canvas', { config: this.configChart.bind(this. chartVm) })
+      ])
+    ])
   },
 
   configChart(chartVm, canvas) { 
@@ -88,17 +64,10 @@ let OrionApp = {
   },
 };
 
-let connectTimeoutMs = 100;
-function connectToVMInput() {
-  ViewModelInput.connect().then(vmInput => {
-    // Only update 60 times / second, even if we get viewmodels more often.
-    vmInput.onUpdate(vm.remote);
-  }, () => {
-    setTimeout(connectToVMInput, connectTimeoutMs);
-    connectTimeoutMs *= 1.5;
-  });
-}
+connectToServer().then(([vmInput, commandOutput]) => {
+  server.commandOutput = commandOutput
+  server.vmInput = vmInput
+  vmInput.onUpdate(vm.remote)
+  m.mount(document.getElementById('app'), OrionApp);
+});
 
-connectToVMInput();
-
-m.mount(document.getElementById('app'), OrionApp);

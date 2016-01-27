@@ -5,7 +5,7 @@ use std::process::exit;
 
 fn formatted_time() -> String {
     let now = time::now();
-    format!("{}:{}:{}", now.tm_hour, now.tm_min, now.tm_sec)
+    format!("{}:{}:{}.{}", now.tm_hour, now.tm_min, now.tm_sec, now.tm_nsec / 1_000_000)
 }
 
 fn log_at_level(level: &'static str, message: &str) {

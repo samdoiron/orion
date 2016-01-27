@@ -39,8 +39,14 @@ pub fn parse_command(message: &str) -> Result<Command, ParseError> {
     }
 }
 
+#[inline]
 fn is_undo_command(message: &str) -> bool {
     message == "undo"
+}
+
+#[inline]
+fn is_do_command(fields: &Vec<&str>) -> bool {
+    fields[0] == "do"
 }
 
 fn get_fields(message: &str) -> Vec<&str> {
@@ -52,11 +58,6 @@ fn make_command_string(fields: Vec<&str>) -> String {
     let join_str = str::from_utf8(&join_slice)
         .ok().expect("COMMAND_FIELD_SEPARATOR is invalid ASCII");
     fields.join(join_str)
-}
-
-#[inline]
-fn is_do_command(fields: &Vec<&str>) -> bool {
-    fields[0] == "do"
 }
 
 // Do commands have a format like "do CreateHistogram something" except
@@ -142,7 +143,6 @@ mod test {
 
     #[test]
     fn undo__extra_at_end__returns_err() {
-        assert_parse_error(vec!["undo", "do"]);
         assert_parse_error(vec!["undo", "do"]);
         assert_parse_error(vec!["undo", "undo"," undo"]);
         assert_parse_error(vec!["undoundo"]);

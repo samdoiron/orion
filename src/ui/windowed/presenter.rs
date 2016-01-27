@@ -3,8 +3,6 @@ use ui::presenter;
 use ui::windowed::view_models;
 use ui::view_model_output::ViewModelOutput;
 
-use std::thread;
-
 use test_util::random;
 
 pub struct Presenter<'a> {
@@ -24,17 +22,14 @@ fn random_series() -> view_models::Series {
 impl<'a> presenter::Presenter<'a, view_models::Main> for Presenter<'a> {
     // See note in ui::presenter
     fn send_initial_vm(&mut self) {
-        loop {
-            let mut series = Vec::new();
-            for _ in 0..10 {
-                series.push(random_series());
-            }
-            self.vm_output.send_vm(&view_models::Main{
-                series: series,
-                charts: vec![]
-            });
-            thread::sleep_ms(1);
+        let mut series = Vec::new();
+        for _ in 0..10 {
+            series.push(random_series());
         }
+        self.vm_output.send_vm(&view_models::Main{
+            series: series,
+            charts: vec![]
+        });
     }
 }
 

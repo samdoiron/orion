@@ -1,0 +1,1 @@
+{"version":3,"sources":["../layout.js"],"names":[],"mappings":";;;;;;UAAgB,OAAO,GAAP,OAAO;UAIP,OAAO,GAAP,OAAO;;WAJP,OAAO;;;;WAIP,OAAO","file":"layout.js","sourcesContent":["export function primary(children) {\n  return m('.l-primary', children);\n}\n\nexport function sidebar(children) {\n  return m('.l-sidebar', children);\n}\n\n"]}
