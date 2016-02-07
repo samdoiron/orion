@@ -1,28 +1,41 @@
 // Orion UI Controller
 // Copyright (C) 2015  Samuel Doiron, see LICENSE for details
+
+// For BTreeMap -> Repo mapping
+
+use std::collections::BTreeMap;
+
+use use_cases::create_histogram::{create_histogram, CreateHistogram, OnHistogramCreated};
+
 use ui::presenter::{Presenter};
 use ui::command_input::CommandInput;
 use ui::command::{Command, CommandAction, is_known};
 use io::transport::TransportError;
+
 use log;
+use std::marker::PhantomData;
 
-pub struct Controller<'a, T: 'a> {
-    presenter: &'a mut  Presenter<'a, T>,
-
-    // Must be box and not a reference, because it we use a function to restore
-    // the connection when it's lost, which can't return a reference because of
-    // what seems to be a rust bug.
+pub struct Controller<'a, P: 'a, T: 'a>
+    where P: Presenter<'a, T> + OnHistogramCreated {
+    presenter: &'a mut P,
     command_input: &'a mut CommandInput,
     action_history: Vec<CommandAction>,
+
+    // Needed because otherwise the `T` is only used for other type
+    // parameters, which Rust doesn't like.
+    // See https://github.com/rust-lang/rust/issues/23246
+    _phantom: PhantomData<T>
 }
 
-impl<'a, T> Controller<'a, T> {
-    pub fn new(commands: &'a mut CommandInput, presenter: &'a mut Presenter<'a, T>) 
-        -> Controller<'a, T> {
+impl<'a, P, T> Controller<'a, P, T>
+    where P: Presenter<'a, T> + OnHistogramCreated {
+    pub fn new(commands: &'a mut CommandInput, presenter: &'a mut P) 
+        -> Controller<'a, P, T> {
         Controller {
             presenter: presenter,
             command_input: commands,
-            action_history: Vec::new()
+            action_history: Vec::new(),
+            _phantom: PhantomData
         }
     }
 
@@ -50,23 +63,32 @@ impl<'a, T> Controller<'a, T> {
     }
 
     fn perform_action(&mut self, action: CommandAction) {
-        // WARNING: This could quickly turn into a switch of death.
-        // CommandAction can't have methods itself because they might have
-        // different arguments (traits implemented by Presenter) and if they
-        // do then we can't store them together.
-        // Might still be OK if I just make one object they all depend on,
-        // but that breaks the rule of "don't depend on functionality you don't need"
-        //match action {
-            //CommandAction::CreateHistogram(name) => create_histogram(self.presenter, name)
-        //}
+        if !is_known(&action) {
+            return
+        }
 
-        if is_known(&action) {
-            println!("Recieved known action request (aka CreateHistogram)");
-            self.action_history.push(action);
+        match action {
+            CommandAction::CreateHistogram(name, series_id) => {
+                // XXX temporary, just create and throw away
+                let request = CreateHistogram {
+                    histogram_repo: &mut BTreeMap::new(),
+                    series_repo: &mut BTreeMap::new(),
+
+                    histogram_name: &name,
+                    series_id: series_id,
+
+                    output: self.presenter
+                };
+                create_histogram(request)
+            },
+            CommandAction::Unknown => {
+                log::fatal("Received unknown command action", 500)
+            }
         }
     }
 
     fn undo_last_action(&mut self) {
-        // TODO
+        // TODO Implement UNDO
+        log::fatal("UNDO not implemented", 404);
     }
 }

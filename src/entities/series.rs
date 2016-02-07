@@ -46,10 +46,10 @@ impl Ord for DataPoint {
     }
 }
 
-pub type SeriesId = String;
+pub type Id = String;
 
-impl Identified<SeriesId> for Series {
-    fn id(&self) -> SeriesId {
+impl Identified<Id> for Series {
+    fn id(&self) -> Id {
         self.name.clone()
     }
 }

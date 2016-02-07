@@ -3,6 +3,10 @@ use ui::presenter;
 use ui::windowed::view_models;
 use ui::view_model_output::ViewModelOutput;
 
+use use_cases::create_histogram::{OnHistogramCreated, CreateHistogramResult};
+
+use log;
+
 use test_util::random;
 
 pub struct Presenter<'a> {
@@ -30,6 +34,16 @@ impl<'a> presenter::Presenter<'a, view_models::Main> for Presenter<'a> {
             series: series,
             charts: vec![]
         });
+    }
+}
+
+impl<'a> OnHistogramCreated for Presenter<'a> {
+    fn on_histogram_created(&mut self, response: CreateHistogramResult) {
+        if response.is_err() {
+            log::fatal("Failed to create histogram", 500);
+        }
+        let created = response.unwrap();
+        println!("Created histogram with id {}", created.histogram_id)
     }
 }
 

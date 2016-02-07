@@ -2,16 +2,17 @@
 use use_cases::repos::{Repo, RepoResult};
 
 use entities::identified::Identified;
-use entities::charts::{Histogram, ChartId};
+use entities::chart;
+use entities::chart::{Histogram};
 
 use std::collections::BTreeMap;
 use std::mem;
 
 macro_rules! impl_in_memory_for {
     ( $( $chart:ident, $map:ident ),* ) => {
-        impl InMemoryRepo {
-            fn new() -> InMemoryRepo {
-                InMemoryRepo {
+        impl InMemory {
+            fn new() -> InMemory {
+                InMemory {
                 $(
                     $map: BTreeMap::new()
                  )*
@@ -19,14 +20,14 @@ macro_rules! impl_in_memory_for {
             }
         }
         $(
-            impl Repo<ChartId, $chart> for InMemoryRepo {
+            impl Repo<chart::Id, $chart> for InMemory {
                 fn add(&mut self, item: $chart) -> RepoResult<()> {
                     let id = item.id();
                     self.$map.insert(id, item);
                     Ok(())
                 }
 
-                fn get(&self, id: ChartId) -> RepoResult<Option<$chart>> {
+                fn get(&self, id: chart::Id) -> RepoResult<Option<$chart>> {
                     Ok(self.$map.get(&id).map(|c| c.clone()))
                 }
 
@@ -39,7 +40,7 @@ macro_rules! impl_in_memory_for {
                     Ok(updated.map(|_| ()))
                 }
 
-                fn remove(&mut self, id: ChartId)
+                fn remove(&mut self, id: chart::Id)
                     -> RepoResult<Option<$chart>> {
                     Ok(self.$map.remove(&id))
                 }
@@ -48,8 +49,8 @@ macro_rules! impl_in_memory_for {
     }
 }
 
-struct InMemoryRepo {
-    histograms: BTreeMap<ChartId, Histogram>
+struct InMemory {
+    histograms: BTreeMap<chart::Id, Histogram>
 }
 
 // Can't generate the struct above, because concat_ident! doesn't work for

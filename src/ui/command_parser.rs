@@ -84,11 +84,11 @@ fn parse_do_command(message: &str) -> ParseResult<Command> {
 
 // Example: "do CreateHistogram some thing goes here"
 fn parse_create_histogram(args: Vec<&str>) -> ParseResult<CommandAction> {
-    if args.len() != 1 {
+    if args.len() != 2 {
         return Err(ParseError);
     }
 
-    Ok(CommandAction::CreateHistogram(args[0].to_string()))
+    Ok(CommandAction::CreateHistogram(args[0].to_string(), args[1].to_string()))
 }
 
 #[cfg(test)]
@@ -157,9 +157,12 @@ mod test {
     #[test]
     fn create_histogram__with_name_field__returns_correct_command() {
         let some_histogram_name = "My awesome histogram".to_string();
+        let some_series_id = "foobar".to_string();
         assert_parse_to(
             vec!["do", "CreateHistogram", &some_histogram_name],
-            Command::Do(CommandAction::CreateHistogram(some_histogram_name.clone()))
+            Command::Do(CommandAction::CreateHistogram(
+                    some_histogram_name.clone(), 
+                    some_series_id))
         );
     }
 }

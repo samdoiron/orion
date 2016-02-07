@@ -1,16 +1,18 @@
 // Copyright (C) 2015  Samuel Doiron, see LICENSE for details
 
 use use_cases::repos::Repo;
-use entities::series::{Series, SeriesId};
-use entities::charts::{Histogram, ChartId};
+use entities::series;
+use entities::series::{Series};
+use entities::chart;
+use entities::chart::{Histogram};
 use entities::identified::Identified;
 
 pub struct CreateHistogram<'a> {
-    pub histogram_repo: &'a mut Repo<ChartId,Histogram>,
-    pub series_repo: &'a mut Repo<SeriesId,Series>,
+    pub histogram_repo: &'a mut Repo<chart::Id, Histogram>,
+    pub series_repo: &'a mut Repo<series::Id,Series>,
 
     pub histogram_name: &'a str,
-    pub series_id: SeriesId,
+    pub series_id: series::Id,
 
     pub output: &'a mut OnHistogramCreated
 }
@@ -18,9 +20,9 @@ pub struct CreateHistogram<'a> {
 /// Sent to `OnHistogramCreated` output port on successful creation.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HistogramCreated {
-    pub histogram_id: ChartId,
+    pub histogram_id: chart::Id,
     pub histogram_name: String,
-    pub series_id: SeriesId,
+    pub series_id: series::Id,
     pub series_name: String
 }
 
@@ -44,7 +46,7 @@ impl<T> OnHistogramCreated for T
     }
 }
 
-pub fn create_histogram(request: &mut CreateHistogram) {
+pub fn create_histogram(request: CreateHistogram) {
     // Ensure that the given series id is valid
     let series_result = request.series_repo.get(request.series_id.clone());
     if series_result.is_err() {
@@ -108,22 +110,24 @@ mod tests {
         let (tx, rx) = mpsc::channel();
         let mut callback = |result| {  tx.send(result).unwrap() };
 
-        let mut request = CreateHistogram {
+        let some_histogram_name = random_name();
+        let request = CreateHistogram {
             histogram_repo: &mut StubRepo::empty(),
-            histogram_name: &random_name(),
+            histogram_name: &some_histogram_name,
             series_id: some_series.id(),
             series_repo: &mut series_repo,
             output: &mut callback
         };
-        create_histogram(&mut request);
+        create_histogram(request);
 
-        let timer = util::ms_timer(200);
+        let some_timeout = 200;
+        let timer = util::ms_timer(some_timeout);
         while timer.try_recv().is_err() {
             let result = rx.try_recv();
             match result {
                 // No mpsc error nor creation error.
                 Ok(Ok(created)) => {
-                    assert_eq!(created.histogram_name, request.histogram_name);
+                    assert_eq!(created.histogram_name, some_histogram_name);
                     assert_eq!(created.series_id, some_series.id());
                     assert_eq!(created.series_name, some_series.name);
                     return
@@ -139,6 +143,7 @@ mod tests {
                 Err(mpsc::TryRecvError::Empty) => ()
             }
         }
+        panic!("Timeout");
     }
 }
 
